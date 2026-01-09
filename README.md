@@ -6,17 +6,6 @@ You give it a *query* (or any “target context”), and a list of candidate tex
 
 ![Tournament / Pyramid reranking process](pyramid_llm_tournament_tree.gif)
 
-## Why reranking?
-
-Embedding retrieval and cross-encoder reranker are fast, but they often struggle with:
-
-* **Context-dependent relevance** (the “right” answer depends on multiple constraints)
-* **Subtle tradeoffs** (e.g., must-have vs nice-to-have requirements)
-* **Long candidates** (CVs, contracts, multi-paragraph docs)
-* **Comparative judgment** (ranking requires relative evaluation, not independent scoring)
-
-A tournament/pyramid approach is a practical way to scale LLM ranking to larger candidate sets by repeatedly narrowing the pool.
-
 ## How the tournament/pyramid works
 
 * Candidates are **interleaved** into groups so early rounds mix “high” and “low” base ranks.
