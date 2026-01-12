@@ -1,6 +1,6 @@
 # Tournament Reranker
 
-A small, dependency-light Python library for **LLM-based reranking** using a **tournament / pyramid** strategy.
+An old idea I had lying in the graveyard of my projects — finally dug up and turned into a small, dependency-light Python library for LLM-based reranking using a tournament / pyramid strategy.
 
 You give it a *query* (or any “target context”), and a list of candidate texts (passages, documents, CVs, product descriptions, etc.). It runs a series of small “mini-rankings” and returns a **top-k** list.
 
