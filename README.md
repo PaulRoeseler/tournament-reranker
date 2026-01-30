@@ -27,21 +27,21 @@ Key knobs live on `pyramid_rerank` / `pyramid_rerank_async`:
 
 ## Installation
 
-This repo ships with a `pyproject.toml`. There are **no required runtime dependencies**.
-
-If you want the built-in OpenAI adapter, install with the optional extra:
+Install from PyPI:
 
 ```bash
-pip install -e ".[openai]"
+pip install tournament-reranker
 ```
+
+This repo ships with a `pyproject.toml` and now depends on `openai>=2.14.0` by default.
 
 Or using `uv`:
 
 ```bash
-uv sync
+uv pip install tournament-reranker
 ```
 
-> If you don’t need the OpenAI adapter, you can skip installing `openai` and provide your own ranker function.
+> You can still bring your own ranker function; the `openai` dependency is installed automatically.
 
 ## Quickstart (sync)
 
@@ -58,15 +58,15 @@ passages = [
     "Toronto is the capital of Ontario.",
 ]
 
-top_chunks = rerank_passages(
+ranks = rerank_passages(
     query="Where is the Eiffel Tower?",
     passages=passages,
     ranker=ranker,
     target_k=2,
 )
 
-for c in top_chunks:
-    print(c.text, c.metadata, c.base_rank)
+for passage, rank in zip(passages, ranks):
+    print(f"rank {rank}: {passage}")
 ```
 
 ## Quickstart (async)
@@ -80,8 +80,8 @@ async def main():
     client = AsyncOpenAI()
     ranker = make_openai_chat_ranker_async(client, model="gpt-4o-mini")
     passages = ["Doc A", "Doc B", "Doc C"]
-    ranked = await rerank_passages_async("Pick the best doc", passages, ranker, target_k=2)
-    print([c.text for c in ranked])
+    ranks = await rerank_passages_async("Pick the best doc", passages, ranker, target_k=2)
+    print(list(zip(passages, ranks)))
 
 asyncio.run(main())
 ```
@@ -118,7 +118,7 @@ metadata = [
 client = OpenAI()
 ranker = make_openai_chat_ranker(client, model="gpt-4o-mini")
 
-top = rerank_passages(
+ranks = rerank_passages(
     query=f"Rank these CVs for the following job:\n\n{job_posting}\n\nPrefer must-haves over nice-to-haves.",
     passages=cvs,
     metadata=metadata,
@@ -126,8 +126,8 @@ top = rerank_passages(
     target_k=2,
 )
 
-for c in top:
-    print(c.metadata["candidate_id"], c.text[:80])
+for cv, meta, rank in zip(cvs, metadata, ranks):
+    print(f"rank {rank} -> {meta['candidate_id']}: {cv[:80]}")
 ```
 
 
@@ -137,12 +137,8 @@ for c in top:
 * `passages`: ordered list of candidate strings (from retrieval or any candidate pool)
 * Optional: `metadata` (same length as `passages`) to carry ids, sources, URLs, scores, etc.
 
-The reranker returns `Chunk` objects with:
-
-* `text`
-* `chunk_id`
-* `metadata`
-* `base_rank` (original order index, useful for audit/tie-breaking)
+The reranker returns a list of integer ranks (1 = best), aligned with the order of
+the `passages` input.
 
 ## Plugging in a different LLM/provider
 
@@ -151,7 +147,7 @@ The library is intentionally simple: you can bring your own model call. A `Ranke
 * input: `(query: str, group: list[Chunk])`
 * output: a **permutation** of `0..n-1` (best → worst)
 
-The default prompt numbers passages `01, 02, 03, ...` (up to 99 per group) and expects a JSON array of those labels, best to worst.
+The default prompt numbers passages `00, 01, 02, ...` (up to 99 per group) and expects a JSON array of those labels, best to worst.
 
 Example:
 
@@ -165,4 +161,3 @@ def my_ranker(query: str, group: list[Chunk]) -> list[int]:
 ```
 
 If the ranker output is missing indices or invalid, the reranker raises a `ValueError`.
-

@@ -10,12 +10,12 @@ passages = [
     "Toronto is the capital of Ontario.",
 ]
 
-top_chunks = rerank_passages(
+ranks = rerank_passages(
     query="Where is the Eiffel Tower?",
     passages=passages,
     ranker=ranker,
     target_k=2,
 )
 
-for c in top_chunks:
-    print(c.text, c.metadata, c.base_rank)
+for passage, rank in zip(passages, ranks):
+    print(f"rank {rank}: {passage}")

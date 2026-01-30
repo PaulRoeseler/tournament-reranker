@@ -9,6 +9,17 @@ class RankingParseError(ValueError):
     """Raised when a ranking response cannot be parsed into any indices."""
 
 
+def label_for(idx: int) -> str:
+    """
+    Convert a zero-based index into the zero-padded label used in prompts.
+    """
+    if idx < 0:
+        raise ValueError("label index must be non-negative")
+    if idx >= 100:
+        raise ValueError("label index must be < 100 to keep labels at two digits")
+    return f"{idx:02d}"
+
+
 def parse_ranking_response_to_indices(response_text: str, n_items: int) -> List[int]:
     """
     Parse a model response into a list of integer indices/labels, preserving order.
@@ -78,5 +89,3 @@ def _coerce_to_int(item: object) -> int | None:
         if s.isdigit():
             return int(s) 
     return None
-
-

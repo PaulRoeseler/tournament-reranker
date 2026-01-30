@@ -21,9 +21,9 @@ def make_ranking_prompt(query: str, group: List[Chunk]) -> str:
         "Rank the passages by usefulness for answering the user's query.\n\n"
         "Output format (mandatory):\n"
         "- Return ONLY a JSON array of the passage numbers, best to worst.\n"
-        "- Labels are 1-indexed and zero-padded: 01, 02, 03, ...\n"
+        "- Labels are 0-indexed and zero-padded: 00, 01, 02, ...\n"
         "- No prose, no markdown, no extra keys.\n"
-        '- Example: ["02","01","03"]\n\n'
+        '- Example: ["01","00","02"]\n\n'
         f"Query:\n{query}\n\n"
         f"Passages:\n{joined}\n"
     )

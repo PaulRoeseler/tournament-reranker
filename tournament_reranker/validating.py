@@ -86,6 +86,16 @@ def validate_permutation(order: Sequence[int], expected_len: int) -> List[int]:
         raise ValueError(f"ranker must return {expected_len} indices")
     if any(not isinstance(i, int) for i in order):
         raise ValueError("ranker must return integer indices")
-    if set(order) != set(range(expected_len)):
-        raise ValueError("ranker must return a permutation of indices 0..n-1")
-    return list(order)
+
+    zero_indexed = set(range(expected_len))
+    if set(order) == zero_indexed:
+        return list(order)
+
+    # Many LLM prompts (including the default one in this library) use 1-indexed
+    # labels like 01, 02, 03. Accept that form too and normalize it to 0-indexed
+    # so the rest of the pipeline can remain zero-based.
+    one_indexed = set(range(1, expected_len + 1))
+    if set(order) == one_indexed:
+        return [i - 1 for i in order]
+
+    raise ValueError("ranker must return a permutation of indices 0..n-1 (or 1..n)")

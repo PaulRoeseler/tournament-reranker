@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional, Sequence
 
 from .validating import ensure_chunks, validate_inputs
-from .pyramid import pyramid_rerank, pyramid_rerank_async
+from .pyramid import pyramid_rank_all, pyramid_rank_all_async, pyramid_rerank, pyramid_rerank_async
 from .types import AsyncRanker, Chunk, Ranker
 
 
@@ -18,7 +18,7 @@ def rerank_passages(
     metadata: Optional[Sequence[Dict[str, Any]]] = None,
     final_rerank: bool = True,
     max_rounds: int = 50,
-) -> List[Chunk]:
+) -> List[int]:
     validate_inputs(
         query,
         ranker,
@@ -29,7 +29,7 @@ def rerank_passages(
     )
     chunks = ensure_chunks(passages, metadata=metadata)
 
-    return pyramid_rerank(
+    return pyramid_rank_all(
         query,
         chunks,
         ranker,
@@ -53,7 +53,7 @@ async def rerank_passages_async(
     final_rerank: bool = True,
     max_rounds: int = 50,
     concurrency_limit: int = 20,
-) -> List[Chunk]:
+) -> List[int]:
     validate_inputs(
         query,
         ranker,
@@ -65,7 +65,7 @@ async def rerank_passages_async(
     )
     chunks = ensure_chunks(passages, metadata=metadata)
 
-    return await pyramid_rerank_async(
+    return await pyramid_rank_all_async(
         query,
         chunks,
         ranker,

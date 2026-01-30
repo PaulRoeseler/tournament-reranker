@@ -1,8 +1,7 @@
 from .api import rerank_passages, rerank_passages_async
-from .baseline import baseline_ranker_by_base_rank
 from .parsing import parse_ranking_response_to_indices
 from .prompts import make_ranking_prompt
-from .pyramid import pyramid_rerank, pyramid_rerank_async
+from .pyramid import pyramid_rank_all, pyramid_rank_all_async, pyramid_rerank, pyramid_rerank_async
 from .types import AsyncRanker, Chunk, PromptBuilder, Ranker
 
 from .adapters import make_openai_chat_ranker, make_openai_chat_ranker_async
@@ -14,11 +13,12 @@ __all__ = [
     "PromptBuilder",
     "rerank_passages",
     "rerank_passages_async",
+    "pyramid_rank_all",
+    "pyramid_rank_all_async",
     "pyramid_rerank",
     "pyramid_rerank_async",
     "make_ranking_prompt",
     "parse_ranking_response_to_indices",
     "make_openai_chat_ranker",
     "make_openai_chat_ranker_async",
-    "baseline_ranker_by_base_rank",
 ]
